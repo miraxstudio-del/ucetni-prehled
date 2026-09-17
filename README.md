@@ -6,7 +6,24 @@ Vytvořilo [Mirax Studio®](https://www.miraxstudio.cz). Program je poskytován 
 
 ![Prázdný výchozí přehled aplikace](docs/images/ucetni-prehled-dashboard-empty.png)
 
-## Aktuální vydání — 1.0.0
+## Aktuální vydání — 1.0.1
+
+Bezpečnostní vydání. Doporučujeme aktualizovat; data ani nastavení zůstávají,
+stačí nový ZIP rozbalit a složky `data` a `storage/app` z předchozí verze do
+něj přenést.
+
+- program nyní odpovídá jen na adresy `127.0.0.1` a `localhost`. Cizí doména
+  přesměrovaná na tento počítač dřív dostala stránky programu jako svůj
+  vlastní obsah a mohla si z nich přečíst ochranný token formulářů;
+- cookies programu mají přísnější nastavení (`SameSite=Strict`, revizní
+  cookie nově nepřístupná JavaScriptu);
+- statické soubory dostávají bezpečnostní hlavičky i mimo aplikaci a server
+  nevydává konfigurační soubory začínající tečkou;
+- odpovědi přibraly hlavičky `Cross-Origin-Opener-Policy`
+  a `Cross-Origin-Resource-Policy`;
+- v zásadách soukromí je nově výčet cookies, které program ukládá.
+
+### Vydání 1.0.0
 
 První veřejné vydání pod názvem **Účetní přehled**.
 
@@ -21,8 +38,8 @@ První veřejné vydání pod názvem **Účetní přehled**.
 
 Hotový program stahujte pouze ze [sekce Releases](https://github.com/miraxstudio-del/ucetni-prehled/releases/latest). Tlačítko **Code → Download ZIP** na GitHubu obsahuje zdrojový kód pro vývojáře, nikoli hotový program k běžnému spuštění.
 
-1. Stáhněte `Ucetni-prehled-Windows-x64-v1.0.0.zip` z [vydání 1.0.0](https://github.com/miraxstudio-del/ucetni-prehled/releases/tag/v1.0.0).
-2. Stáhněte také soubor `Ucetni-prehled-Windows-x64-v1.0.0.zip.sha256` a volitelně ověřte kontrolní součet.
+1. Stáhněte `Ucetni-prehled-Windows-x64-v1.0.1.zip` z [vydání 1.0.1](https://github.com/miraxstudio-del/ucetni-prehled/releases/tag/v1.0.1).
+2. Stáhněte také soubor `Ucetni-prehled-Windows-x64-v1.0.1.zip.sha256` a volitelně ověřte kontrolní součet.
 3. ZIP kompletně rozbalte do libovolné složky.
 4. Dvakrát klikněte na `START.bat`.
 5. Program se otevře v místním prohlížeči. Pro ukončení spusťte `STOP.bat`.
@@ -36,10 +53,10 @@ Při prvním spuštění se automaticky vytvoří prázdná lokální databáze 
 Soubor `.sha256` ověřuje, že instalační ZIP byl stažen celý a nebyl změněn. V PowerShellu spusťte ve složce se staženým ZIPem:
 
 ```powershell
-Get-FileHash .\Ucetni-prehled-Windows-x64-v1.0.0.zip -Algorithm SHA256
+Get-FileHash .\Ucetni-prehled-Windows-x64-v1.0.1.zip -Algorithm SHA256
 ```
 
-Zobrazený otisk musí přesně odpovídat hodnotě v souboru `Ucetni-prehled-Windows-x64-v1.0.0.zip.sha256` přiloženém k témuž Release.
+Zobrazený otisk musí přesně odpovídat hodnotě v souboru `Ucetni-prehled-Windows-x64-v1.0.1.zip.sha256` přiloženém k témuž Release.
 
 ## Funkce
 
