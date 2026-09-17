@@ -18,6 +18,17 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'DENY');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
+        // Cizí stránka si nesmí vzít nic z aplikace ani jako obrázek či soubor
+        // (CORP), ani si držet odkaz na její okno (COOP). U místního programu,
+        // který nemá přihlášení, je to hlavní obrana proti tomu, aby si na něj
+        // web otevřený ve stejném prohlížeči vůbec dosáhl.
+        $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+
+        // X-XSS-Protection tu schválně není: filtr, který zapínala, prohlížeče
+        // odstranily a v některých verzích sám tvořil zranitelnost. Tuhle roli
+        // plní CSP níž.
+
         // CSP se vynechává jen při běžícím Vite dev serveru (hot reload)
         if (! Vite::isRunningHot()) {
             $response->headers->set('Content-Security-Policy', $this->contentSecurityPolicy());

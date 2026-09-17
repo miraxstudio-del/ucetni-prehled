@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Jednorazove obnovi cache lokalniho prohlizece po aktualizaci Účetní přehled.
@@ -19,7 +19,10 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class RefreshBrowserAssetCache
 {
-    private const REVISION = '2026-07-28-1';
+    /** Verejna proto, aby ji testy mohly poslat a neresily presmerovani. */
+    public const REVISION = '2026-07-28-1';
+
+    public const COOKIE = 'ucetni_prehled_asset_cache_revision';
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -28,20 +31,25 @@ class RefreshBrowserAssetCache
         if (
             $request->isMethod('GET')
             && str_contains($accept, 'text/html')
-            && $request->cookie('ucetni_prehled_asset_cache_revision') !== self::REVISION
+            && $request->cookie(self::COOKIE) !== self::REVISION
         ) {
             $response = redirect()->to($request->fullUrl());
             $response->headers->set('Clear-Site-Data', '"cache"');
+
+            // Cookie cte jen server, takze do JavaScriptu nepatri (httpOnly)
+            // a nema duvod odejit u pozadavku, ktery zacal na cizim webu
+            // (SameSite=Strict) — stejne jako cookie relace. Neni v ni nic
+            // osobniho, jen cislo revize vydani.
             $response->headers->setCookie(Cookie::create(
-                'ucetni_prehled_asset_cache_revision',
+                self::COOKIE,
                 self::REVISION,
                 now()->addYear(),
                 '/',
                 null,
                 false,
+                true,
                 false,
-                false,
-                Cookie::SAMESITE_LAX,
+                Cookie::SAMESITE_STRICT,
             ));
 
             return $response;

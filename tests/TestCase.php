@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Enums\Role;
+use App\Http\Middleware\RefreshBrowserAssetCache;
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\User;
@@ -16,6 +17,15 @@ abstract class TestCase extends BaseTestCase
 
         // Testy nepotřebují Vite build (manifest nemusí existovat)
         $this->withoutVite();
+
+        // RefreshBrowserAssetCache přesměruje první HTML požadavek prohlížeče,
+        // dokud nemá revizní cookie. V testech by tak každá stránka odpovídala
+        // 302 místo 200, takže cookii posíláme rovnou. Samotné přesměrování
+        // ověřuje AssetCacheRefreshTest.
+        $this->withCookie(
+            RefreshBrowserAssetCache::COOKIE,
+            RefreshBrowserAssetCache::REVISION,
+        );
     }
 
     /** Vytvoří ověřeného uživatele s organizací a členstvím v dané roli. */

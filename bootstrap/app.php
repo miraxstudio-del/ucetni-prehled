@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AllowLocalRequestsOnly;
 use App\Http\Middleware\EstablishLocalPlatformContext;
 use App\Http\Middleware\RefreshBrowserAssetCache;
 use App\Http\Middleware\SecurityHeaders;
@@ -15,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Musí běžet dřív než cokoli dalšího: EstablishLocalPlatformContext
+        // požadavek rovnou přihlásí a zapisuje do databáze, takže cizí Host
+        // je potřeba odmítnout ještě před ním.
+        $middleware->prepend(AllowLocalRequestsOnly::class);
+
         $middleware->web(append: [
             EstablishLocalPlatformContext::class,
             RefreshBrowserAssetCache::class,

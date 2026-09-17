@@ -197,9 +197,15 @@ return [
     |
     | Supported: "lax", "strict", "none", null
     |
+    | Proti výchozímu Laravelu je tu "strict" místo "lax": na Účetní přehled
+    | se nikdo nedostává odkazem z jiného webu, takže cookie nemá důvod
+    | opouštět vlastní původ ani u požadavku, který začal jinde. Výchozí
+    | hodnota je tady schválně, ne v .env — platí tím i pro instalace, které
+    | .env dostaly ze starší verze a řádek SESSION_SAME_SITE v něm nemají.
+    |
     */
 
-    'same_site' => env('SESSION_SAME_SITE', 'lax'),
+    'same_site' => env('SESSION_SAME_SITE', 'strict'),
 
     /*
     |--------------------------------------------------------------------------

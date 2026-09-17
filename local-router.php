@@ -15,9 +15,18 @@ $requestedFile = $publicDirectory === false
     ? false
     : realpath($publicDirectory.DIRECTORY_SEPARATOR.ltrim(urldecode($requestPath), '/'));
 
+/*
+ * Soubory zacinajici teckou (.htaccess a podobne) se neservíruji. Do public
+ * nepatri nic tajneho, ale server, ktery vydava konfiguracni soubory, jen
+ * zbytecne prozrazuje, jak je aplikace postavena.
+ */
+$isHiddenFile = $requestedFile !== false
+    && str_starts_with(basename($requestedFile), '.');
+
 if (
     $publicDirectory !== false
     && $requestedFile !== false
+    && ! $isHiddenFile
     && str_starts_with($requestedFile, $publicDirectory.DIRECTORY_SEPARATOR)
     && is_file($requestedFile)
 ) {
@@ -39,6 +48,15 @@ if (
         'ico' => 'image/x-icon',
         default => mime_content_type($requestedFile) ?: 'application/octet-stream',
     };
+
+    /*
+     * Staticke soubory jdou mimo Laravel, takze na ne bezpecnostni hlavicky
+     * z middleware SecurityHeaders nedosahnou a je potreba je poslat tady.
+     * nosniff je hlavni z nich: bez nej by prohlizec mohl u nerozpoznaneho
+     * typu obsah uhadnout a spustit ho jako skript.
+     */
+    header('X-Content-Type-Options: nosniff');
+    header('Cross-Origin-Resource-Policy: same-origin');
 
     header('Content-Type: '.$contentType);
     header('Content-Length: '.filesize($requestedFile));

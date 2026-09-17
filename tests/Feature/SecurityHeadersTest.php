@@ -18,6 +18,8 @@ class SecurityHeadersTest extends TestCase
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('X-Frame-Options', 'DENY');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->assertHeader('Cross-Origin-Resource-Policy', 'same-origin');
+        $response->assertHeader('Cross-Origin-Opener-Policy', 'same-origin');
 
         $csp = $response->headers->get('Content-Security-Policy');
         $this->assertNotNull($csp);
@@ -93,6 +95,21 @@ class SecurityHeadersTest extends TestCase
 
         $this->assertNotNull($cookie);
         $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    /**
+     * Na místní program se nikdo nedostává odkazem z jiného webu, takže
+     * cookie nemá důvod odejít u požadavku, který začal jinde.
+     */
+    public function test_session_cookie_is_same_site_strict(): void
+    {
+        $this->assertSame('strict', config('session.same_site'));
+
+        $cookie = collect($this->get('/prehled')->headers->getCookies())
+            ->first(fn ($c) => $c->getName() === config('session.cookie'));
+
+        $this->assertNotNull($cookie);
+        $this->assertSame('strict', strtolower((string) $cookie->getSameSite()));
     }
 
     public function test_destructive_actions_ask_for_confirmation(): void
